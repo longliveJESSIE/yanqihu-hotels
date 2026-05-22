@@ -1,0 +1,4 @@
+page {
+  font-family: -apple-system, "Microsoft YaHei", sans-serif;
+  background: #fff;
+}

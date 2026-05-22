@@ -1,0 +1,2 @@
+<web-view src="{{mapUrl}}" bindmessage="onMessage" bindload="onLoad" binderror="onError">
+</web-view>
