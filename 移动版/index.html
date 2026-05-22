@@ -133,7 +133,7 @@ body,html { width:100%; height:100%; font-family:-apple-system,"Microsoft YaHei"
 </head>
 <body>
 
-<div id="map"></div>
+<div id="map" style="background:#e8f4f8;"></div>
 
 <div id="sr-wrap">
     <input id="sr-input" type="text" placeholder="搜索任意地址..." onkeydown="if(event.key==='Enter')doSearch()">
@@ -314,15 +314,7 @@ function toggleSheet(){
 buildSheet();
 </script>
 
-<script>
-if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register("data:application/javascript," + encodeURIComponent(
-        "self.addEventListener('install',function(e){self.skipWaiting();});" +
-        "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});" +
-        "self.addEventListener('fetch',function(e){e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open('v1').then(function(ca){ca.put(e.request,c);});return r;}).catch(function(){return caches.match(e.request);}));});"
-    ));
-}
-</script>
+
 
 </body>
 </html>
