@@ -79,16 +79,78 @@ body, html { width: 100%; height: 100%; font-family: -apple-system, "Microsoft Y
 }
 .tag-h { background: #e74c3c; } .tag-b { background: #3498db; } .tag-u { background: #f39c12; }
 .leaflet-popup-content-wrapper { border-radius: 12px; }
+
+/* 搜索面板 */
+#search-panel {
+    position: fixed; top: 80px; left: 16px; z-index: 1000;
+    background: rgba(255,255,255,0.92); border-radius: 14px;
+    padding: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    width: 280px;
+}
+#search-panel input {
+    width: 100%; border: 2px solid #e0e0e0; padding: 8px 12px;
+    border-radius: 20px; font-size: 13px; outline: none; font-family: inherit;
+}
+#search-panel input:focus { border-color: #2196F3; }
+#sr-list { max-height: 260px; overflow-y: auto; display: none; }
+#sr-list.show { display: block; }
+.sr-item {
+    padding: 8px 10px; border-radius: 8px; cursor: pointer;
+    font-size: 12px; transition: background 0.15s;
+}
+.sr-item:hover { background: #f0f0f0; }
+.sr-item .n { font-weight: 500; color: #333; }
+.sr-item .a { color: #999; font-size: 11px; margin-top: 2px; }
+.mk-search { background: #9C27B0; width: 36px; height: 36px; line-height: 36px; font-size: 14px; }
+
+/* 右侧 Top20 价格排行 */
+#top20-panel {
+    position: fixed; top: 80px; right: 16px; z-index: 1000;
+    background: rgba(255,255,255,0.94); border-radius: 14px;
+    padding: 12px 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    width: 220px; max-height: calc(100vh - 110px); overflow-y: auto;
+}
+#top20-panel h4 {
+    font-size: 13px; color: #e74c3c; margin-bottom: 8px;
+    text-align: center; border-bottom: 1px solid #eee; padding-bottom: 8px;
+}
+.t20-item {
+    display: flex; align-items: center; gap: 6px; padding: 5px 6px;
+    border-radius: 6px; cursor: pointer; transition: background 0.15s;
+    font-size: 12px;
+}
+.t20-item:hover { background: #fef0f0; }
+.t20-rank {
+    width: 18px; height: 18px; border-radius: 50%; background: #e74c3c;
+    color: #fff; text-align: center; line-height: 18px; font-size: 10px; flex-shrink: 0;
+}
+.t20-item:nth-child(-n+3) .t20-rank { background: #f39c12; }
+.t20-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #333; }
+.t20-price { color: #e74c3c; font-weight: bold; flex-shrink: 0; }
+
+/* 移动端隐藏侧边栏 */
+@media (max-width: 900px) {
+    #top20-panel { display: none; }
+    #search-panel { width: 240px; }
+}
+
 </style>
 </head>
 <body>
 
 <div id="map"></div>
 
+
+<div id="search-panel">
+    <input type="text" id="sr-input" placeholder="搜索任意地址/地标..." onkeydown="if(event.key==='Enter')doAddrSearch()">
+    <div id="sr-list"></div>
+</div>
+
 <div id="controls">
     <button id="btn-all" class="active" onclick="filter('all')">全部(151)</button>
     <button id="btn-hotel" onclick="filter('hotel')">酒店(40)</button>
     <button id="btn-bnb" onclick="filter('bnb')">民宿(110)</button>
+    <button id="btn-ucas" onclick="focusUCAS()">🎓 国科大</button>
     <input id="search" type="text" placeholder="搜索名称/地址..." oninput="doSearch(this.value)">
     <span id="count"></span>
 </div>
@@ -168,7 +230,7 @@ function makePopup(d) {
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程详情页（实时房价）</a>';
         } else {
             // 没有 ID，用搜索链接
-            var searchUrl = "https://cn.bing.com/search?q=" + enc + "&cityId=1&checkin=2026-06-20&checkout=2026-06-21";
+            var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）·•·]/g,"").trim()); var searchUrl = "https://cn.bing.com/search?q=" + fuzzyEnc + "+携程+北京怀柔";
             h += '<a href="' + searchUrl + '" target="_blank" rel="noopener" class="search">携程搜索</a>';
         }
 
@@ -188,12 +250,12 @@ function makePopup(d) {
         if (d.contact) h += '<div class="row">负责人：' + d.contact + '</div>';
 
         h += '<div class="actions">';
-        // 民宿用携程搜索
+        // 民宿：有携程ID用详情页，否则用移动端搜索
         if (d.ctrip_id && d.ctrip_id.trim()) {
             var detailUrl = "https://hotels.ctrip.com/hotels/" + d.ctrip_id + ".html?checkin=2026-06-20&checkout=2026-06-21";
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程详情页（实时房价）</a>';
         } else {
-            var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）]/g,"").replace(/[·•]/g,"").trim());
+            var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）]/g,"").replace(/[·•\.·]/g,"").trim());
             var searchUrl = "https://cn.bing.com/search?q=" + fuzzyEnc + "+携程+北京怀柔";
             h += '<a href="' + searchUrl + '" target="_blank" rel="noopener" class="search">携程搜索</a>';
         }
@@ -222,6 +284,94 @@ DATA.forEach(function(d) {
 
 map.fitBounds(bounds, { padding: [50, 50] });
 document.getElementById("count").textContent = "显示 " + allMarkers.length + " 个";
+
+
+// ===== UCAS 聚焦 & Top20 跳转 =====
+function focusUCAS() {
+    document.querySelectorAll("#controls button").forEach(function(b) { b.classList.remove("active"); });
+    document.getElementById("btn-ucas").classList.add("active");
+    map.closePopup();
+    // 找到国科大标记
+    for (var i = 0; i < allMarkers.length; i++) {
+        if (allMarkers[i]._category === "ucas") {
+            map.setView(allMarkers[i].getLatLng(), 15);
+            allMarkers[i].openPopup();
+            break;
+        }
+    }
+}
+
+function jumpTo(name) {
+    document.querySelectorAll("#controls button").forEach(function(b) { b.classList.remove("active"); });
+    document.getElementById("btn-all").classList.add("active");
+    document.getElementById("search").value = "";
+    // 显示全部
+    allMarkers.forEach(function(m) { m.addTo(map); });
+    // 找对应标记
+    for (var i = 0; i < allMarkers.length; i++) {
+        if (allMarkers[i]._name === name) {
+            map.setView(allMarkers[i].getLatLng(), 16);
+            allMarkers[i].openPopup();
+            break;
+        }
+    }
+    updateCount();
+}
+
+// ===== 地址搜索（JSONP 避免 CORS）=====
+var searchMarker = null;
+var _searchResults = [];
+var _jsonpC = 0;
+
+function doAddrSearch() {
+    var q = document.getElementById("sr-input").value.trim();
+    if (!q) return;
+    var list = document.getElementById("sr-list");
+    list.innerHTML = '<div style="padding:8px;color:#999;font-size:12px;">搜索中...</div>';
+    list.classList.add("show");
+
+    var cb = "_gcb_" + (++_jsonpC);
+    window[cb] = function(data) {
+        delete window[cb];
+        try { document.body.removeChild(document.getElementById(cb)); } catch(e) {}
+        if (data.status !== "1" || !data.pois || data.pois.length === 0) {
+            list.innerHTML = '<div style="padding:8px;color:#999;font-size:12px;">无结果</div>';
+            return;
+        }
+        _searchResults = data.pois;
+        var h = "";
+        data.pois.forEach(function(p, i) {
+            h += '<div class="sr-item" onclick="addSearchPin(' + i + ')"><div class="n">' + (i+1) + '. ' + p.name + '</div><div class="a">' + (p.address || "") + '</div></div>';
+        });
+        list.innerHTML = h;
+        addSearchPin(0);
+    };
+
+    var s = document.createElement("script");
+    s.id = cb;
+    s.src = "https://restapi.amap.com/v3/place/text?key=6f4658f8b6a777d5a86415b1c0eaf6f0&keywords=" + encodeURIComponent(q) + "&city=北京&citylimit=false&offset=8&callback=" + cb;
+    s.onerror = function() { list.innerHTML = '<div style="padding:8px;color:#e74c3c;font-size:12px;">搜索失败</div>'; delete window[cb]; };
+    document.body.appendChild(s);
+}
+
+function addSearchPin(idx) {
+    var pois = _searchResults;
+    if (!pois || idx >= pois.length) return;
+    var p = pois[idx];
+    var lng = parseFloat(p.location.split(",")[0]);
+    var lat = parseFloat(p.location.split(",")[1]);
+    if (searchMarker) map.removeLayer(searchMarker);
+
+    var mk = L.divIcon({className: "", html: '<div class="marker-pin mk-search">📍</div>', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36]});
+    searchMarker = L.marker([lat, lng], {icon: mk}).addTo(map);
+    var enc = encodeURIComponent(p.name);
+    searchMarker.bindPopup('<div class="info-window"><h3><span class="tag" style="background:#9C27B0;display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;color:#fff;">📍</span> ' + p.name + '</h3><p>地址：' + (p.address||"") + '</p><div class="links"><a href="https://cn.bing.com/search?q=' + enc + ' 携程" target="_blank" rel="noopener">携程搜索周边</a></div></div>', {maxWidth: 350}).openPopup();
+    map.setView([lat, lng], Math.max(map.getZoom(), 14));
+    document.querySelectorAll(".sr-item").forEach(function(el, i) { el.style.background = i === idx ? "#e3f2fd" : ""; });
+}
+
+map.on("click", function() { document.getElementById("sr-list").classList.remove("show"); });
+// ===== 地址搜索结束 =====
 
 function filter(cat) {
     document.querySelectorAll("#controls button").forEach(function(b) { b.classList.remove("active"); });
@@ -260,5 +410,31 @@ function updateCount() {
     document.getElementById("count").textContent = "显示 " + n + " 个";
 }
 </script>
+
+<div id="top20-panel">
+    <h4>标间低价 Top 20</h4>
+    <div class="t20-item" onclick="jumpTo('布丁酒店（怀柔商业街店）')"><span class="t20-rank">1</span><span class="t20-name">布丁酒店（怀柔商业街店）</span><span class="t20-price">¥110</span></div>
+<div class="t20-item" onclick="jumpTo('尚客优雁栖店')"><span class="t20-rank">2</span><span class="t20-name">尚客优雁栖店</span><span class="t20-price">¥200</span></div>
+<div class="t20-item" onclick="jumpTo('北京康弘鑫源酒店')"><span class="t20-rank">3</span><span class="t20-name">北京康弘鑫源酒店</span><span class="t20-price">¥210</span></div>
+<div class="t20-item" onclick="jumpTo('中影影剧酒店')"><span class="t20-rank">4</span><span class="t20-name">中影影剧酒店</span><span class="t20-price">¥218</span></div>
+<div class="t20-item" onclick="jumpTo('如家怀柔迎宾路店')"><span class="t20-rank">5</span><span class="t20-name">如家怀柔迎宾路店</span><span class="t20-price">¥223</span></div>
+<div class="t20-item" onclick="jumpTo('格林豪泰')"><span class="t20-rank">6</span><span class="t20-name">格林豪泰</span><span class="t20-price">¥230</span></div>
+<div class="t20-item" onclick="jumpTo('华奥之星商务酒店')"><span class="t20-rank">7</span><span class="t20-name">华奥之星商务酒店</span><span class="t20-price">¥258</span></div>
+<div class="t20-item" onclick="jumpTo('速8精选酒店怀柔开放路店')"><span class="t20-rank">8</span><span class="t20-name">速8精选酒店怀柔开放路店</span><span class="t20-price">¥260</span></div>
+<div class="t20-item" onclick="jumpTo('锦江之星怀柔青春路万达店')"><span class="t20-rank">9</span><span class="t20-name">锦江之星怀柔青春路万达店</span><span class="t20-price">¥260</span></div>
+<div class="t20-item" onclick="jumpTo('碧云蓝山商旅酒店')"><span class="t20-rank">10</span><span class="t20-name">碧云蓝山商旅酒店</span><span class="t20-price">¥269</span></div>
+<div class="t20-item" onclick="jumpTo('汉庭北京怀柔中心酒店')"><span class="t20-rank">11</span><span class="t20-name">汉庭北京怀柔中心酒店</span><span class="t20-price">¥271</span></div>
+<div class="t20-item" onclick="jumpTo('宜珵酒店')"><span class="t20-rank">12</span><span class="t20-name">宜珵酒店</span><span class="t20-price">¥280</span></div>
+<div class="t20-item" onclick="jumpTo('汉庭北京怀柔杨宋电影学院酒店')"><span class="t20-rank">13</span><span class="t20-name">汉庭北京怀柔杨宋电影学院酒店</span><span class="t20-price">¥289</span></div>
+<div class="t20-item" onclick="jumpTo('北京团圆假日饭店有限公')"><span class="t20-rank">14</span><span class="t20-name">北京团圆假日饭店有限公</span><span class="t20-price">¥300</span></div>
+<div class="t20-item" onclick="jumpTo('桔子北京怀柔中心万达广场酒店')"><span class="t20-rank">15</span><span class="t20-name">桔子北京怀柔中心万达广场酒店</span><span class="t20-price">¥340</span></div>
+<div class="t20-item" onclick="jumpTo('北京双阳宾馆')"><span class="t20-rank">16</span><span class="t20-name">北京双阳宾馆</span><span class="t20-price">¥340</span></div>
+<div class="t20-item" onclick="jumpTo('中青旅山水时尚酒店怀柔雁栖湖科学城店')"><span class="t20-rank">17</span><span class="t20-name">中青旅山水时尚酒店怀柔雁栖湖科学</span><span class="t20-price">¥350</span></div>
+<div class="t20-item" onclick="jumpTo('丽枫酒店北京怀柔环岛万达商业街店')"><span class="t20-rank">18</span><span class="t20-name">丽枫酒店北京怀柔环岛万达商业街店</span><span class="t20-price">¥350</span></div>
+<div class="t20-item" onclick="jumpTo('中影大酒店')"><span class="t20-rank">19</span><span class="t20-name">中影大酒店</span><span class="t20-price">¥360</span></div>
+<div class="t20-item" onclick="jumpTo('北京中影大酒店')"><span class="t20-rank">20</span><span class="t20-name">北京中影大酒店</span><span class="t20-price">¥360</span></div>
+
+</div>
+
 </body>
 </html>
