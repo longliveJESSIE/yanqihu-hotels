@@ -190,7 +190,7 @@ function mkPop(d){
     h+='<div class="btns">';
     if(d.phone)h+='<a href="tel:'+d.phone+'" class="tl" style="font-size:13px;padding:8px 16px;">📞 电话预订</a>';
     if(d.ctrip_id&&d.ctrip_id.trim()){
-        h+='<a href="https://longlivejessie.github.io/yanqihu-hotels/移动版/ctrip-proxy.html?id='+d.ctrip_id+'&name='+encodeURIComponent(d.name)+'" target="_blank" class="ct">携程查价</a>';
+        h+='<a href="https://https://longlivejessie.github.io/yanqihu-hotels/移动版/ctrip-proxy.html?id='+d.ctrip_id+'&name='+encodeURIComponent(d.name)+'" target="_blank" class="ct">携程查价</a>';
     }else{
         h+='<a href="https://www.baidu.com/s?wd='+encodeURIComponent(d.name+'+携程+北京怀柔')+'" target="_blank" class="sr">百度搜索</a>';
     }
@@ -267,7 +267,7 @@ function pinSr(i){
     if(isListed){
         var dd=DATA.find(function(d){return d.name===x.name;});
         if(dd&&dd.ctrip_id&&dd.ctrip_id.trim()){
-            ctLink='<a href="https://longlivejessie.github.io/yanqihu-hotels/移动版/ctrip-proxy.html?id='+d.ctrip_id+'&name='+encodeURIComponent(d.name)+'" target="_blank" class="ct">携程详情页</a>';
+            ctLink='<a href="https://https://longlivejessie.github.io/yanqihu-hotels/移动版/ctrip-proxy.html?id='+d.ctrip_id+'&name='+encodeURIComponent(d.name)+'" target="_blank" class="ct">携程详情页</a>';
         }
     }
     var popup='<div class="iw"><h3>'+(isListed?'🏷️ ':'📍 ')+x.name+'</h3><div class="r">'+(x.address||"")+'</div><div class="btns">'+ctLink+'<a href="https://www.baidu.com/s?wd='+encodeURIComponent(x.name+'+携程')+'" target="_blank" class="sr">百度搜索</a></div></div>';
