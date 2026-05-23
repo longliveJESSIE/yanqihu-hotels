@@ -179,7 +179,7 @@ function mkPop(d){
     var h='<div class="iw"><h3>'+d.name+'</h3><div class="r">'+d.address+'</div>';
     if(d.category==="hotel"){
         if(d.distance)h+='<div class="r">距国科大:'+d.distance+'km</div>';
-        if(d.price)h+='<div class="pb"><span class="big">'+d.price+'</span></div>';
+        if(d.price)h+='<div class="pb"><span class="big">'+d.price+'</span><div style="font-size:10px;color:#999;margin-top:2px;">（2025年7月毕业季参考价）</div></div>';
         if(d.phone)h+='<div class="r">📞<a href="tel:'+d.phone+'">'+d.phone+'</a></div>';
     }
     if(d.category==="bnb"){
