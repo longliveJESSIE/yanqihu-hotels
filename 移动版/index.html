@@ -161,14 +161,7 @@ function makeTileLayer(url,opts){
     return t;
 }
 
-var tiles=[
-    makeTileLayer("https://rt{s}.map.gtimg.com/tile?z={z}&x={x}&y={y}&styleid=3&type=vector",{subdomains:["0","1","2","3"],maxZoom:18}),
-    makeTileLayer("https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",{subdomains:["1","2","3","4"],maxZoom:18}),
-    makeTileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}),
-];
-
-var map=L.map("map",{zoom:13,center:[40.395,116.68],layers:[tiles[0]]});
-L.control.layers({"腾讯":tiles[0],"高德":tiles[1],"OSM":tiles[2]},null,{position:"bottomright"}).addTo(map);
+var gaode=L.tileLayer("https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",{subdomains:["1","2","3","4"],maxZoom:18});var map=L.map("map",{zoom:13,center:[40.395,116.68],layers:[gaode]});
 
 var allM=[],srM=null,shOpen=false;
 
