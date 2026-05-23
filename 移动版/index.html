@@ -189,7 +189,7 @@ function mkPop(d){
     }
     h+='<div class="btns">';
     if(d.ctrip_id&&d.ctrip_id.trim()){
-        h+='<a href="https://hotels.ctrip.com/hotels/'+d.ctrip_id+'.html?checkin=2026-06-20&checkout=2026-06-21" target="_blank" class="ct">携程 6.20-21</a>';
+        h+='<a href="https://hotels.ctrip.com/hotels/'+d.ctrip_id+'.html?StartDate=2026-06-20&DepDate=2026-06-21&checkin=2026-06-20&checkout=2026-06-21#hotelRoomBox" target="_blank" class="ct">携程 6.20-21</a>';
     }else{
         h+='<a href="https://www.baidu.com/s?wd='+encodeURIComponent(d.name+'+携程+北京怀柔')+'" target="_blank" class="sr">百度搜索</a>';
     }

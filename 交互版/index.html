@@ -226,7 +226,7 @@ function makePopup(d) {
 
         // 如果有携程 ID，直接链接详情页（含日期）
         if (d.ctrip_id && d.ctrip_id.trim()) {
-            var detailUrl = "https://hotels.ctrip.com/hotels/" + d.ctrip_id + ".html?checkin=2026-06-20&checkout=2026-06-21";
+            var detailUrl = "https://hotels.ctrip.com/hotels/" + d.ctrip_id + ".html?StartDate=2026-06-20&DepDate=2026-06-21&checkin=2026-06-20&checkout=2026-06-21#hotelRoomBox";
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程 6.20-21 实时房价</a>';
         } else {
             // 没有 ID，用搜索链接
@@ -252,7 +252,7 @@ function makePopup(d) {
         h += '<div class="actions">';
         // 民宿：有携程ID用详情页，否则用移动端搜索
         if (d.ctrip_id && d.ctrip_id.trim()) {
-            var detailUrl = "https://hotels.ctrip.com/hotels/" + d.ctrip_id + ".html?checkin=2026-06-20&checkout=2026-06-21";
+            var detailUrl = "https://hotels.ctrip.com/hotels/" + d.ctrip_id + ".html?StartDate=2026-06-20&DepDate=2026-06-21&checkin=2026-06-20&checkout=2026-06-21#hotelRoomBox";
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程 6.20-21 实时房价</a>';
         } else {
             var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）]/g,"").replace(/[·•\.·]/g,"").trim());

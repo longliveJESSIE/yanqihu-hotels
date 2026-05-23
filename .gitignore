@@ -4,3 +4,5 @@ __pycache__/
 generate_map.py
 酒店与民宿/
 /tmp/
+.claude/
+map_leaflet.html
