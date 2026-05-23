@@ -120,11 +120,15 @@ body,html{width:100%;height:100%;font-family:-apple-system,"Microsoft YaHei",san
 <div id="map"></div>
 
 <div id="topbar">
-    <button class="btn-all on" onclick="flt('all')">全部</button>
-    <button class="btn-h" onclick="flt('hotel')">酒店</button>
-    <button class="btn-b" onclick="flt('bnb')">民宿</button>
-    <button class="btn-u" onclick="focusUCAS()">国科大</button>
-    <input type="text" id="srin" placeholder="搜地址..." onkeydown="if(event.key==='Enter')doSr()">
+    <div class="btn-row">
+        <button class="btn-all on" onclick="flt('all')">全部</button>
+        <button class="btn-h" onclick="flt('hotel')">酒店</button>
+        <button class="btn-b" onclick="flt('bnb')">民宿</button>
+        <button class="btn-u" onclick="focusUCAS()">国科大</button>
+    </div>
+    <div class="sr-row">
+        <input type="text" id="srin" placeholder="搜索任意地址..." onkeydown="if(event.key==='Enter')doSr()">
+    </div>
 </div>
 
 <div id="search-panel"></div>
