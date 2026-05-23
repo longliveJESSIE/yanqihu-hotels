@@ -168,7 +168,7 @@ function makePopup(d) {
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程详情页（实时房价）</a>';
         } else {
             // 没有 ID，用搜索链接
-            var searchUrl = "https://cn.bing.com/search?q=" + enc + "&cityId=1&checkin=2026-06-20&checkout=2026-06-21";
+            var searchUrl = "https://www.baidu.com/s?wd=" + enc + "&cityId=1&checkin=2026-06-20&checkout=2026-06-21";
             h += '<a href="' + searchUrl + '" target="_blank" rel="noopener" class="search">携程搜索</a>';
         }
 
@@ -194,7 +194,7 @@ function makePopup(d) {
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程详情页（实时房价）</a>';
         } else {
             var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）]/g,"").replace(/[·•]/g,"").trim());
-            var searchUrl = "https://cn.bing.com/search?q=" + fuzzyEnc + "+携程+北京怀柔";
+            var searchUrl = "https://www.baidu.com/s?wd=" + fuzzyEnc + "+携程+北京怀柔";
             h += '<a href="' + searchUrl + '" target="_blank" rel="noopener" class="search">携程搜索</a>';
         }
         if (d.phone) h += '<a href="tel:' + d.phone + '" class="tel">电话预订</a>';

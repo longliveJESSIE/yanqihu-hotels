@@ -230,7 +230,7 @@ function makePopup(d) {
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程详情页（实时房价）</a>';
         } else {
             // 没有 ID，用搜索链接
-            var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）·•·]/g,"").trim()); var searchUrl = "https://cn.bing.com/search?q=" + fuzzyEnc + "+携程+北京怀柔";
+            var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）·•·]/g,"").trim()); var searchUrl = "https://www.baidu.com/s?wd=" + fuzzyEnc + "+携程+北京怀柔";
             h += '<a href="' + searchUrl + '" target="_blank" rel="noopener" class="search">携程搜索</a>';
         }
 
@@ -256,7 +256,7 @@ function makePopup(d) {
             h += '<a href="' + detailUrl + '" target="_blank" rel="noopener" class="ctrip">携程详情页（实时房价）</a>';
         } else {
             var fuzzyEnc = encodeURIComponent((d.fuzzy_name || d.name).replace(/[（(].*?[)）]/g,"").replace(/[·•\.·]/g,"").trim());
-            var searchUrl = "https://cn.bing.com/search?q=" + fuzzyEnc + "+携程+北京怀柔";
+            var searchUrl = "https://www.baidu.com/s?wd=" + fuzzyEnc + "+携程+北京怀柔";
             h += '<a href="' + searchUrl + '" target="_blank" rel="noopener" class="search">携程搜索</a>';
         }
         if (d.phone) h += '<a href="tel:' + d.phone + '" class="tel">电话预订</a>';
@@ -365,7 +365,7 @@ function addSearchPin(idx) {
     var mk = L.divIcon({className: "", html: '<div class="marker-pin mk-search">📍</div>', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36]});
     searchMarker = L.marker([lat, lng], {icon: mk}).addTo(map);
     var enc = encodeURIComponent(p.name);
-    searchMarker.bindPopup('<div class="info-window"><h3><span class="tag" style="background:#9C27B0;display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;color:#fff;">📍</span> ' + p.name + '</h3><p>地址：' + (p.address||"") + '</p><div class="links"><a href="https://cn.bing.com/search?q=' + enc + ' 携程" target="_blank" rel="noopener">携程搜索周边</a></div></div>', {maxWidth: 350}).openPopup();
+    searchMarker.bindPopup('<div class="info-window"><h3><span class="tag" style="background:#9C27B0;display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;color:#fff;">📍</span> ' + p.name + '</h3><p>地址：' + (p.address||"") + '</p><div class="links"><a href="https://www.baidu.com/s?wd=' + enc + ' 携程" target="_blank" rel="noopener">携程搜索周边</a></div></div>', {maxWidth: 350}).openPopup();
     map.setView([lat, lng], Math.max(map.getZoom(), 14));
     document.querySelectorAll(".sr-item").forEach(function(el, i) { el.style.background = i === idx ? "#e3f2fd" : ""; });
 }
