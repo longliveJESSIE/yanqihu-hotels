@@ -32,11 +32,34 @@ var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(
     'https://m.ctrip.com/html5/hotel/hoteldetail/' + hotelId + '?checkInDate=20260620&checkOutDate=20260621'
 );
 
-fetch(proxyUrl)
-    .then(function(r) { return r.text(); })
-    .then(function(html) {
+// 多个CORS代理，依次尝试
+var proxyUrls = [
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://m.ctrip.com/html5/hotel/hoteldetail/' + hotelId + '?checkInDate=20260620&checkOutDate=20260621'),
+    'https://corsproxy.io/?' + encodeURIComponent('https://m.ctrip.com/html5/hotel/hoteldetail/' + hotelId + '?checkInDate=20260620&checkOutDate=20260621'),
+];
+
+function tryProxy(index) {
+    if (index >= proxyUrls.length) {
+        // 所有代理失败，直接跳转携程
+        document.getElementById('loading').innerHTML = '<p>正在跳转携程...</p>';
+        window.location.href = 'https://m.ctrip.com/html5/hotel/hoteldetail/' + hotelId + '?checkInDate=20260620&checkOutDate=20260621';
+        return;
+    }
+    fetch(proxyUrls[index])
+        .then(function(r) { if(!r.ok) throw new Error('bad status'); return r.text(); })
+        .then(function(html) {
+            processHtml(html);
+        })
+        .catch(function() {
+            tryProxy(index + 1);
+        });
+}
+
+tryProxy(0);
+
+function processHtml(html) {
         // 在页面中注入日期强制脚本
-        var injected = html.replace('</head>', 
+    var injected = html.replace('</head>', 
             '<script>window.__FORCE_CHECKIN="20260620";window.__FORCE_CHECKOUT="20260621";<\/script></head>');
         
         // 也尝试修改页面的日期初始化逻辑
