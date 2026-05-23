@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>携程查价 - 6月20-21日</title>
+<style>
+body{margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,sans-serif}
+#loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:9999;background:#fff;padding:20px 40px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+.spinner{width:40px;height:40px;border:4px solid #eee;border-top:4px solid #2196F3;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#frame{width:100%;height:100%;border:none;display:none}
+#tip{display:none;position:fixed;bottom:0;left:0;right:0;background:#2196F3;color:#fff;text-align:center;padding:14px;font-size:14px;z-index:9998}
+</style>
+</head>
+<body>
+<div id="loading">
+    <div class="spinner"></div>
+    <p style="font-size:14px;color:#333;">正在加载携程...</p>
+    <p style="font-size:12px;color:#999;">6月20日 - 21日</p>
+</div>
+<iframe id="frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"></iframe>
+<div id="tip">💡 请确认入住:6月20日 离店:6月21日</div>
+
+<script>
+var params = new URLSearchParams(window.location.search);
+var hotelId = params.get('id') || '1210428';
+var name = params.get('name') || '';
+
+// 使用 allorigins CORS 代理获取携程页面
+var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(
+    'https://m.ctrip.com/html5/hotel/hoteldetail/' + hotelId + '?checkInDate=20260620&checkOutDate=20260621'
+);
+
+fetch(proxyUrl)
+    .then(function(r) { return r.text(); })
+    .then(function(html) {
+        // 在页面中注入日期强制脚本
+        var injected = html.replace('</head>', 
+            '<script>window.__FORCE_CHECKIN="20260620";window.__FORCE_CHECKOUT="20260621";<\/script></head>');
+        
+        // 也尝试修改页面的日期初始化逻辑
+        injected = injected.replace(
+            /new Date\(\)/g,
+            'new Date(2026,5,20)'  // June = 5 (0-indexed)
+        );
+        injected = injected.replace(
+            /Date\.now\(\)/g,
+            'new Date(2026,5,20).getTime()'
+        );
+        
+        var frame = document.getElementById('frame');
+        var blob = new Blob([injected], {type: 'text/html'});
+        frame.src = URL.createObjectURL(blob);
+        frame.style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('tip').style.display = 'block';
+    })
+    .catch(function(e) {
+        // 代理失败，直接跳转携程
+        document.getElementById('loading').innerHTML = '<p>代理加载失败</p><p style="font-size:12px;color:#999;">正在跳转携程...</p>';
+        window.location.href = 'https://m.ctrip.com/html5/hotel/hoteldetail/' + hotelId + '?checkInDate=20260620&checkOutDate=20260621';
+    });
+</script>
+</body>
+</html>
