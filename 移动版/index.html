@@ -197,6 +197,13 @@ function mkPop(d){
     h+='</div></div>';return h;
 }
 
+// 电话确认
+function confirmCall(phone,name){
+    if(confirm("确定要拨打 "+name+" 的电话吗？\n\n"+phone)){
+        window.location.href="tel:"+phone;
+    }
+}
+
 // 筛选
 function flt(cat){
     document.querySelectorAll("#topbar button").forEach(function(b){b.classList.remove("on");});
