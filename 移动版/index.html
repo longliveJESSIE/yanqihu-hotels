@@ -189,7 +189,7 @@ function mkPop(d){
     }
     h+='<div class="btns">';
     if(d.ctrip_id&&d.ctrip_id.trim()){
-        h+='<a href="https://hotels.ctrip.com/hotels/'+d.ctrip_id+'.html?StartDate=20260620&DepDate=20260621&checkIn=2026-06-20&checkOut=2026-06-21" target="_blank" class="ct">携程详情页</a>';
+        h+='<a href="https://m.ctrip.com/html5/hotel/hoteldetail/'+d.ctrip_id+'?checkIn=2026-06-20&checkOut=2026-06-21#roomList" target="_blank" class="ct">携程详情页</a>';
     }else{
         h+='<a href="https://www.baidu.com/s?wd='+encodeURIComponent(d.name+'+携程+北京怀柔')+'" target="_blank" class="sr">百度搜索</a>';
     }
@@ -267,7 +267,7 @@ function pinSr(i){
     if(isListed){
         var dd=DATA.find(function(d){return d.name===x.name;});
         if(dd&&dd.ctrip_id&&dd.ctrip_id.trim()){
-            ctLink='<a href="https://hotels.ctrip.com/hotels/'+dd.ctrip_id+'.html?StartDate=20260620&DepDate=20260621&checkIn=2026-06-20&checkOut=2026-06-21" target="_blank" class="ct">携程详情页</a>';
+            ctLink='<a href="https://m.ctrip.com/html5/hotel/hoteldetail/'+dd.ctrip_id+'?checkIn=2026-06-20&checkOut=2026-06-21#roomList" target="_blank" class="ct">携程详情页</a>';
         }
     }
     var popup='<div class="iw"><h3>'+(isListed?'🏷️ ':'📍 ')+x.name+'</h3><div class="r">'+(x.address||"")+'</div><div class="btns">'+ctLink+'<a href="https://www.baidu.com/s?wd='+encodeURIComponent(x.name+'+携程')+'" target="_blank" class="sr">百度搜索</a></div></div>';
