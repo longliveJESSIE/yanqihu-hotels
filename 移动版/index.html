@@ -178,8 +178,8 @@ DATA.forEach(function(d){
     var mk=MK[d.category]||MK.bnb;
     var m=L.marker([d.lat,d.lng],{icon:L.divIcon({className:"",html:'<div class="mk-pin '+mk.c+'">'+mk.l+'</div>',iconSize:[mk.s,mk.s],iconAnchor:[mk.s/2,mk.s/2],popupAnchor:[0,-mk.s/2]})});
     m._d=d;m._cat=d.category;m._name=d.name;
-    m.on("click",function(){map.setView(this.getLatLng(),Math.max(map.getZoom(),15));this.openPopup();});
     m.bindPopup(mkPop(d),{maxWidth:300});
+    m.on("click",function(){map.panTo(this.getLatLng());});
     allM.push(m);m.addTo(map);
 });
 
