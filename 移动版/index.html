@@ -197,6 +197,13 @@ function mkPop(d){
     h+='</div></div>';return h;
 }
 
+
+function confirmCall(phone,name){
+    if(confirm('确定要拨打 '+name+' ?\n'+phone)){
+        location.href='tel:'+phone;
+    }
+}
+
 // 筛选
 function flt(cat){
     document.querySelectorAll("#topbar button").forEach(function(b){b.classList.remove("on");});
