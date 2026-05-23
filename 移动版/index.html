@@ -189,7 +189,7 @@ function mkPop(d){
     }
     h+='<div class="btns">';
     if(d.ctrip_id&&d.ctrip_id.trim()){
-        h+='<a href="https://hotels.ctrip.com/hotels/'+d.ctrip_id+'.html?StartDate=2026-06-20&DepDate=2026-06-21&checkin=2026-06-20&checkout=2026-06-21#hotelRoomBox" target="_blank" class="ct">携程详情页</a>';
+        h+='<a href="https://hotels.ctrip.com/hotels/'+d.ctrip_id+'.html?checkIn=2026-06-20&checkOut=2026-06-21" target="_blank" class="ct">携程详情页</a>';
     }else{
         h+='<a href="https://www.baidu.com/s?wd='+encodeURIComponent(d.name+'+携程+北京怀柔')+'" target="_blank" class="sr">百度搜索</a>';
     }
@@ -213,18 +213,39 @@ function focusUCAS(){
     for(var i=0;i<allM.length;i++){if(allM[i]._cat==="ucas"){map.setView(allM[i].getLatLng(),15);allM[i].openPopup();break;}}
 }
 
-// 搜索
+// 搜索(优先匹配列表内酒店/民宿)
 var _sr=[],_sc=0;
 function doSr(){
     var q=document.getElementById("srin").value.trim();if(!q)return;
     var p=document.getElementById("search-panel");
     p.innerHTML='<div style="padding:10px;color:#999;">搜索中...</div>';p.classList.add("show");
+
+    // 1. 先匹配列表内的酒店/民宿
+    var ql=q.toLowerCase();
+    var matched=DATA.filter(function(d){
+        return d.lng!==0&&d.lat!==0&&(
+            d.name.toLowerCase().indexOf(ql)!==-1||
+            d.address.toLowerCase().indexOf(ql)!==-1||
+            (d.town&&d.town.toLowerCase().indexOf(ql)!==-1)
+        );
+    }).slice(0,5);
+
+    // 2. 同时调高德搜索
     var cb="_g_"+ (++_sc);
     window[cb]=function(d){
         delete window[cb];try{document.body.removeChild(document.getElementById(cb));}catch(e){}
-        if(d.status!=="1"||!d.pois||!d.pois.length){p.innerHTML='<div style="padding:10px;color:#999;">无结果</div>';return;}
-        _sr=d.pois;var h="";
-        d.pois.forEach(function(x,i){h+='<div class="sr-item" onclick="pinSr('+i+')"><div class="n">'+(i+1)+'. '+x.name+'</div><div class="a">'+(x.address||"")+'</div></div>';});
+        var results=[];
+        // 先放匹配的列表内项目
+        matched.forEach(function(x){results.push({name:x.name,address:x.address,location:x.lng+","+x.lat,_type:"listed"});});
+        // 再放高德搜索结果
+        if(d.status==="1"&&d.pois){d.pois.forEach(function(x){results.push({name:x.name,address:x.address||"",location:x.location,_type:"search"});});}
+        if(!results.length){p.innerHTML='<div style="padding:10px;color:#999;">无结果</div>';return;}
+        _sr=results;
+        var h="";
+        results.forEach(function(x,i){
+            var icon=x._type==="listed"?"🏷️ ":"📍 ";
+            h+='<div class="sr-item" onclick="pinSr('+i+')"><div class="n">'+icon+(i+1)+'. '+x.name+'</div><div class="a">'+(x.address||"")+'</div></div>';
+        });
         p.innerHTML=h;pinSr(0);
     };
     var s=document.createElement("script");s.id=cb;
@@ -235,10 +256,23 @@ function doSr(){
 
 function pinSr(i){
     var x=_sr[i];if(!x)return;if(srM)map.removeLayer(srM);
-    var mk=L.divIcon({className:"",html:'<div class="mk-pin mk-s">📍</div>',iconSize:[36,36],iconAnchor:[18,36],popupAnchor:[0,-36]});
-    srM=L.marker([parseFloat(x.location.split(",")[1]),parseFloat(x.location.split(",")[0])],{icon:mk}).addTo(map);
-    srM.bindPopup('<div class="iw"><h3>'+x.name+'</h3><div class="r">'+(x.address||"")+'</div><div class="btns"><a href="https://www.baidu.com/s?wd='+encodeURIComponent(x.name+'+携程')+'" target="_blank" class="sr">百度搜索</a></div></div>',{maxWidth:280}).openPopup();
-    map.setView(srM.getLatLng(),15);
+    var isListed=x._type==="listed";
+    var iconHtml=isListed?'<div class="mk-pin mk-h">🏷</div>':'<div class="mk-pin mk-s">📍</div>';
+    var mk=L.divIcon({className:"",html:iconHtml,iconSize:[36,36],iconAnchor:[18,36],popupAnchor:[0,-36]});
+    var lat=parseFloat(x.location.split(",")[1]),lng=parseFloat(x.location.split(",")[0]);
+    srM=L.marker([lat,lng],{icon:mk}).addTo(map);
+
+    // 找到对应数据的携程链接
+    var ctLink="";
+    if(isListed){
+        var dd=DATA.find(function(d){return d.name===x.name;});
+        if(dd&&dd.ctrip_id&&dd.ctrip_id.trim()){
+            ctLink='<a href="https://hotels.ctrip.com/hotels/'+dd.ctrip_id+'.html?checkIn=2026-06-20&checkOut=2026-06-21" target="_blank" class="ct">携程详情页</a>';
+        }
+    }
+    var popup='<div class="iw"><h3>'+(isListed?'🏷️ ':'📍 ')+x.name+'</h3><div class="r">'+(x.address||"")+'</div><div class="btns">'+ctLink+'<a href="https://www.baidu.com/s?wd='+encodeURIComponent(x.name+'+携程')+'" target="_blank" class="sr">百度搜索</a></div></div>';
+    srM.bindPopup(popup,{maxWidth:280}).openPopup();
+    map.setView([lat,lng],15);
 }
 
 map.on("click",function(){document.getElementById("search-panel").classList.remove("show");});
